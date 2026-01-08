@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cek Pesanan - Mie Spagethy</title>
+
+<style>
+body {
+    font-family: Arial, sans-serif;
+    background: #f5f7fa;
+    padding: 20px;
+}
+.container {
+    max-width: 500px;
+    margin: auto;
+    background: white;
+    padding: 25px;
+    border-radius: 10px;
+    box-shadow: 0 5px 20px rgba(0,0,0,.1);
+}
+h1 {
+    text-align: center;
+    color: #2d2d5f;
+}
+input, button {
+    width: 100%;
+    padding: 12px;
+    margin-top: 10px;
+    font-size: 16px;
+}
+button {
+    background: #2d2d5f;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+.result {
+    margin-top: 20px;
+    display: none;
+}
+.status {
+    font-weight: bold;
+    margin-top: 10px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+    <h1>🔍 Cek Pesanan</h1>
+
+    <input type="text" id="orderInput" placeholder="Masukkan Nomor Pesanan">
+    <button onclick="cekPesanan()">Cek Status</button>
+
+    <div class="result" id="result">
+        <p><b>Nama:</b> <span id="rName"></span></p>
+        <p><b>Total:</b> <span id="rTotal"></span></p>
+        <p class="status"><b>Status:</b> <span id="rStatus"></span></p>
+    </div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+const firebaseConfig = {
+    apiKey: "AIzaSyAOoabfDQLplb2b0u0SL9HWiDnU_MY9ER4",
+    authDomain: "miespaghetypesanan.firebaseapp.com",
+    databaseURL: "https://miespaghetypesanan-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "miespaghetypesanan",
+    storageBucket: "miespaghetypesanan.firebasestorage.app",
+    messagingSenderId: "507508443828",
+    appId: "1:507508443828:web:e3f543b59e117666caa5e1"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
+window.cekPesanan = async function () {
+    const nomor = document.getElementById("orderInput").value.trim().toUpperCase();
+    if (!nomor) return alert("Masukkan nomor pesanan");
+
+    const snap = await get(ref(db, "orders/" + nomor));
+
+    if (!snap.exists()) {
+        alert("Pesanan tidak ditemukan");
+        return;
+    }
+
+    const data = snap.val();
+    document.getElementById("rName").textContent = data.name;
+    document.getElementById("rTotal").textContent = "Rp " + data.total.toLocaleString("id-ID");
+    document.getElementById("rStatus").textContent = data.status;
+
+    document.getElementById("result").style.display = "block";
+};
+</script>
+
+</body>
+</html>
