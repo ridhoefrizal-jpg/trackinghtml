@@ -1,102 +1,487 @@
 <!DOCTYPE html>
+
 <html lang="id">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Cek Pesanan - Mie Spagethy</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cek Status Pesanan - Mie Spagethy</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-<style>
-body {
-    font-family: Arial, sans-serif;
-    background: #f5f7fa;
-    padding: 20px;
-}
-.container {
-    max-width: 500px;
-    margin: auto;
-    background: white;
-    padding: 25px;
-    border-radius: 10px;
-    box-shadow: 0 5px 20px rgba(0,0,0,.1);
-}
-h1 {
-    text-align: center;
-    color: #2d2d5f;
-}
-input, button {
-    width: 100%;
-    padding: 12px;
-    margin-top: 10px;
-    font-size: 16px;
-}
-button {
-    background: #2d2d5f;
-    color: white;
-    border: none;
-    cursor: pointer;
-}
-.result {
-    margin-top: 20px;
-    display: none;
-}
-.status {
-    font-weight: bold;
-    margin-top: 10px;
-}
+```
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        min-height: 100vh;
+        padding: 20px;
+    }
+
+    .container {
+        max-width: 600px;
+        margin: 0 auto;
+    }
+
+    .header {
+        background: white;
+        border-radius: 20px;
+        padding: 30px;
+        text-align: center;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        margin-bottom: 20px;
+    }
+
+    .brand-name {
+        font-size: 2rem;
+        font-weight: bold;
+        color: #2d2d5f;
+        margin-bottom: 10px;
+    }
+
+    .subtitle {
+        color: #666;
+        font-size: 1.1rem;
+    }
+
+    .search-card {
+        background: white;
+        border-radius: 20px;
+        padding: 30px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        margin-bottom: 20px;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .form-label {
+        display: block;
+        font-size: 1rem;
+        color: #666;
+        margin-bottom: 10px;
+        font-weight: 500;
+    }
+
+    .form-input {
+        width: 100%;
+        padding: 15px;
+        border: 2px solid #ddd;
+        border-radius: 10px;
+        font-size: 1.1rem;
+        font-family: inherit;
+        text-transform: uppercase;
+    }
+
+    .form-input:focus {
+        outline: none;
+        border-color: #2d2d5f;
+    }
+
+    .search-btn {
+        width: 100%;
+        padding: 15px;
+        background: #2d2d5f;
+        color: white;
+        border: none;
+        border-radius: 10px;
+        font-size: 1.1rem;
+        font-weight: bold;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+    }
+
+    .search-btn:hover {
+        background: #1f1f45;
+    }
+
+    .search-btn:disabled {
+        background: #ccc;
+        cursor: not-allowed;
+    }
+
+    .result-card {
+        background: white;
+        border-radius: 20px;
+        padding: 30px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        display: none;
+    }
+
+    .result-card.show {
+        display: block;
+    }
+
+    .order-header {
+        text-align: center;
+        margin-bottom: 30px;
+        padding-bottom: 20px;
+        border-bottom: 2px solid #f0f0f0;
+    }
+
+    .order-number {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: #2d2d5f;
+        margin-bottom: 10px;
+    }
+
+    .order-date {
+        color: #999;
+        font-size: 0.9rem;
+    }
+
+    .status-timeline {
+        margin: 30px 0;
+    }
+
+    .status-step {
+        display: flex;
+        align-items: flex-start;
+        position: relative;
+        padding-left: 50px;
+        margin-bottom: 30px;
+    }
+
+    .status-step:last-child {
+        margin-bottom: 0;
+    }
+
+    .status-icon {
+        position: absolute;
+        left: 0;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+        font-weight: bold;
+        background: #e0e0e0;
+        color: #999;
+    }
+
+    .status-step.active .status-icon {
+        background: #2d2d5f;
+        color: white;
+    }
+
+    .status-step.completed .status-icon {
+        background: #28a745;
+        color: white;
+    }
+
+    .status-line {
+        position: absolute;
+        left: 19px;
+        top: 40px;
+        width: 2px;
+        height: calc(100% + 30px);
+        background: #e0e0e0;
+    }
+
+    .status-step.completed .status-line {
+        background: #28a745;
+    }
+
+    .status-content {
+        flex: 1;
+    }
+
+    .status-title {
+        font-size: 1.1rem;
+        font-weight: bold;
+        color: #333;
+        margin-bottom: 5px;
+    }
+
+    .status-step.active .status-title {
+        color: #2d2d5f;
+    }
+
+    .status-desc {
+        color: #666;
+        font-size: 0.9rem;
+    }
+
+    .order-details {
+        background: #f9f9f9;
+        padding: 20px;
+        border-radius: 10px;
+        margin-top: 30px;
+    }
+
+    .detail-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 10px 0;
+        border-bottom: 1px solid #e0e0e0;
+    }
+
+    .detail-row:last-child {
+        border-bottom: none;
+    }
+
+    .detail-label {
+        color: #666;
+        font-size: 0.9rem;
+    }
+
+    .detail-value {
+        font-weight: bold;
+        color: #333;
+    }
+
+    .error-message {
+        background: #fff3cd;
+        border-left: 4px solid #ffc107;
+        padding: 15px;
+        border-radius: 5px;
+        color: #856404;
+        text-align: center;
+        display: none;
+    }
+
+    .error-message.show {
+        display: block;
+    }
+
+    .back-btn {
+        width: 100%;
+        padding: 15px;
+        background: white;
+        color: #2d2d5f;
+        border: 2px solid #2d2d5f;
+        border-radius: 10px;
+        font-size: 1rem;
+        font-weight: bold;
+        cursor: pointer;
+        margin-top: 20px;
+    }
+
+    .loading {
+        text-align: center;
+        padding: 20px;
+        color: #666;
+    }
+
+    @media (max-width: 480px) {
+        .brand-name {
+            font-size: 1.5rem;
+        }
+    }
 </style>
+```
+
 </head>
-
 <body>
+    <div class="container">
+        <div class="header">
+            <div class="brand-name">MIE SPAGETHY</div>
+            <p class="subtitle">🔍 Lacak Status Pesanan Anda</p>
+        </div>
 
-<div class="container">
-    <h1>🔍 Cek Pesanan</h1>
+```
+    <div class="search-card">
+        <form id="searchForm">
+            <div class="form-group">
+                <label class="form-label">Masukkan Nomor Pesanan</label>
+                <input 
+                    type="text" 
+                    class="form-input" 
+                    id="orderInput" 
+                    placeholder="Contoh: SP12345678"
+                    required
+                >
+                <p style="color: #999; font-size: 0.85rem; margin-top: 8px;">
+                    💡 Nomor pesanan ada di konfirmasi pesanan Anda
+                </p>
+            </div>
 
-    <input type="text" id="orderInput" placeholder="Masukkan Nomor Pesanan">
-    <button onclick="cekPesanan()">Cek Status</button>
+            <div class="error-message" id="errorMessage">
+                ❌ Pesanan tidak ditemukan. Periksa kembali nomor pesanan Anda.
+            </div>
 
-    <div class="result" id="result">
-        <p><b>Nama:</b> <span id="rName"></span></p>
-        <p><b>Total:</b> <span id="rTotal"></span></p>
-        <p class="status"><b>Status:</b> <span id="rStatus"></span></p>
+            <button type="submit" class="search-btn" id="searchBtn">
+                <span>🔍</span>
+                <span>Cek Status Pesanan</span>
+            </button>
+        </form>
+    </div>
+
+    <div class="result-card" id="resultCard">
+        <div class="order-header">
+            <div class="order-number" id="displayOrderNumber"></div>
+            <div class="order-date" id="displayOrderDate"></div>
+        </div>
+
+        <div class="status-timeline" id="statusTimeline">
+            <!-- Timeline will be inserted here -->
+        </div>
+
+        <div class="order-details">
+            <h3 style="margin-bottom: 15px; color: #2d2d5f;">Detail Pesanan</h3>
+            <div class="detail-row">
+                <span class="detail-label">Nama</span>
+                <span class="detail-value" id="displayName"></span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">No. HP</span>
+                <span class="detail-value" id="displayPhone"></span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Alamat</span>
+                <span class="detail-value" id="displayAddress"></span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Jumlah</span>
+                <span class="detail-value" id="displayQty"></span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Total</span>
+                <span class="detail-value" id="displayTotal"></span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Pembayaran</span>
+                <span class="detail-value" id="displayPayment"></span>
+            </div>
+        </div>
+
+        <button class="back-btn" onclick="resetSearch()">← Cek Pesanan Lain</button>
     </div>
 </div>
 
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+    import { getDatabase, ref, get } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
 
-const firebaseConfig = {
-    apiKey: "AIzaSyAOoabfDQLplb2b0u0SL9HWiDnU_MY9ER4",
-    authDomain: "miespaghetypesanan.firebaseapp.com",
-    databaseURL: "https://miespaghetypesanan-default-rtdb.asia-southeast1.firebasedatabase.app",
-    projectId: "miespaghetypesanan",
-    storageBucket: "miespaghetypesanan.firebasestorage.app",
-    messagingSenderId: "507508443828",
-    appId: "1:507508443828:web:e3f543b59e117666caa5e1"
-};
+    const firebaseConfig = {
+        apiKey: "AIzaSyAOoabfDQLplb2b0u0SL9HWiDnU_MY9ER4",
+        authDomain: "miespaghetypesanan.firebaseapp.com",
+        databaseURL: "https://miespaghetypesanan-default-rtdb.asia-southeast1.firebasedatabase.app",
+        projectId: "miespaghetypesanan",
+        storageBucket: "miespaghetypesanan.firebasestorage.app",
+        messagingSenderId: "507508443828",
+        appId: "1:507508443828:web:e3f543b59e117666caa5e1"
+    };
 
-const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
+    const app = initializeApp(firebaseConfig);
+    const database = getDatabase(app);
 
-window.cekPesanan = async function () {
-    const nomor = document.getElementById("orderInput").value.trim().toUpperCase();
-    if (!nomor) return alert("Masukkan nomor pesanan");
+    document.getElementById('searchForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const orderNumber = document.getElementById('orderInput').value.trim().toUpperCase();
+        const searchBtn = document.getElementById('searchBtn');
+        const errorMessage = document.getElementById('errorMessage');
+        
+        searchBtn.disabled = true;
+        searchBtn.innerHTML = '<span>⏳</span><span>Mencari...</span>';
+        errorMessage.classList.remove('show');
 
-    const snap = await get(ref(db, "orders/" + nomor));
+        try {
+            const ordersRef = ref(database, 'orders');
+            const snapshot = await get(ordersRef);
+            
+            let foundOrder = null;
+            
+            snapshot.forEach((childSnapshot) => {
+                const order = childSnapshot.val();
+                if (order.orderNumber === orderNumber) {
+                    foundOrder = {
+                        id: childSnapshot.key,
+                        ...order
+                    };
+                }
+            });
 
-    if (!snap.exists()) {
-        alert("Pesanan tidak ditemukan");
-        return;
+            if (foundOrder) {
+                displayOrderResult(foundOrder);
+            } else {
+                errorMessage.classList.add('show');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Terjadi kesalahan. Silakan coba lagi.');
+        } finally {
+            searchBtn.disabled = false;
+            searchBtn.innerHTML = '<span>🔍</span><span>Cek Status Pesanan</span>';
+        }
+    });
+
+    function displayOrderResult(order) {
+        document.getElementById('displayOrderNumber').textContent = '#' + order.orderNumber;
+        document.getElementById('displayOrderDate').textContent = new Date(order.timestamp).toLocaleString('id-ID');
+        document.getElementById('displayName').textContent = order.name;
+        document.getElementById('displayPhone').textContent = order.phone;
+        document.getElementById('displayAddress').textContent = order.address;
+        document.getElementById('displayQty').textContent = order.quantity + ' porsi';
+        document.getElementById('displayTotal').textContent = 'Rp ' + order.total.toLocaleString('id-ID');
+        document.getElementById('displayPayment').textContent = order.payment;
+
+        const timeline = createTimeline(order.status);
+        document.getElementById('statusTimeline').innerHTML = timeline;
+
+        document.querySelector('.search-card').style.display = 'none';
+        document.getElementById('resultCard').classList.add('show');
     }
 
-    const data = snap.val();
-    document.getElementById("rName").textContent = data.name;
-    document.getElementById("rTotal").textContent = "Rp " + data.total.toLocaleString("id-ID");
-    document.getElementById("rStatus").textContent = data.status;
+    function createTimeline(currentStatus) {
+        // Jika pesanan ditolak, tampilkan status khusus
+        if (currentStatus === 'ditolak') {
+            return `
+                <div class="status-step completed">
+                    <div class="status-icon" style="background: #dc3545;">❌</div>
+                    <div class="status-content">
+                        <div class="status-title" style="color: #dc3545;">Pesanan Ditolak</div>
+                        <div class="status-desc">Mohon maaf, pesanan Anda tidak dapat diproses. Silakan hubungi kami untuk informasi lebih lanjut.</div>
+                    </div>
+                </div>
+            `;
+        }
 
-    document.getElementById("result").style.display = "block";
-};
+        const statuses = [
+            { key: 'pending', icon: '📝', title: 'Pesanan Diterima', desc: 'Pesanan Anda telah diterima' },
+            { key: 'diproses', icon: '👨‍🍳', title: 'Sedang Diproses', desc: 'Pesanan sedang disiapkan' },
+            { key: 'dikirim', icon: '🚚', title: 'Sedang Dikirim', desc: 'Pesanan dalam perjalanan' },
+            { key: 'selesai', icon: '✅', title: 'Pesanan Selesai', desc: 'Pesanan telah sampai' }
+        ];
+
+        const currentIndex = statuses.findIndex(s => s.key === currentStatus);
+
+        return statuses.map((status, index) => {
+            const isCompleted = index < currentIndex;
+            const isActive = index === currentIndex;
+            const showLine = index < statuses.length - 1;
+
+            return `
+                <div class="status-step ${isCompleted ? 'completed' : ''} ${isActive ? 'active' : ''}">
+                    <div class="status-icon">${status.icon}</div>
+                    ${showLine ? '<div class="status-line"></div>' : ''}
+                    <div class="status-content">
+                        <div class="status-title">${status.title}</div>
+                        <div class="status-desc">${status.desc}</div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    window.resetSearch = function() {
+        document.querySelector('.search-card').style.display = 'block';
+        document.getElementById('resultCard').classList.remove('show');
+        document.getElementById('orderInput').value = '';
+        document.getElementById('errorMessage').classList.remove('show');
+    };
 </script>
+```
 
 </body>
 </html>
